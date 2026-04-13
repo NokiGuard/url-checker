@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sandbox Link Checker — Settings</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 14px;
+      color: #1a1a1a;
+      background: #f5f5f5;
+      padding: 40px 20px;
+    }
+
+    .page { max-width: 580px; margin: 0 auto; }
+
+    h1 {
+      font-size: 22px;
+      color: #1565c0;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 32px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #888;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .field { margin-bottom: 18px; }
+    .field:last-child { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #888;
+      margin-top: 5px;
+      line-height: 1.5;
+    }
+
+    .hint a { color: #1565c0; }
+
+    input[type="password"],
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid #d0d0d0;
+      border-radius: 7px;
+      font-size: 14px;
+      background: #fafafa;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #1565c0;
+      box-shadow: 0 0 0 3px rgba(21,101,192,0.12);
+      background: #fff;
+    }
+
+    input.error { border-color: #b71c1c; }
+
+    .threshold-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+
+    .threshold-row:last-child { margin-bottom: 0; }
+
+    .threshold-row span { flex: 1; color: #444; }
+
+    select {
+      padding: 7px 10px;
+      border: 1px solid #d0d0d0;
+      border-radius: 7px;
+      font-size: 13px;
+      background: #fafafa;
+      cursor: pointer;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #1565c0;
+    }
+
+    .color-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .btn-primary {
+      background: #1565c0;
+      color: #fff;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 7px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: filter 0.15s;
+    }
+
+    .btn-primary:hover { filter: brightness(0.9); }
+
+    .btn-secondary {
+      background: #e8e8e8;
+      color: #444;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: filter 0.15s;
+    }
+
+    .btn-secondary:hover { filter: brightness(0.95); }
+
+    #status {
+      margin-top: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      min-height: 20px;
+    }
+
+    .status-ok  { color: #2e7d32; }
+    .status-err { color: #b71c1c; }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f5f5f5;
+      font-size: 13px;
+    }
+
+    .stats-row:last-of-type { border-bottom: none; }
+    .stats-row .val { font-weight: 600; color: #1565c0; }
+
+    .actions-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    footer {
+      margin-top: 24px;
+      font-size: 11px;
+      color: #bbb;
+      text-align: center;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <h1>URL Checker</h1>
+  <p class="subtitle">Configure your VirusTotal API key and Private Browser preferences.</p>
+
+  <!-- API Key -->
+  <div class="card">
+    <div class="card-title">VirusTotal API</div>
+
+    <div class="field">
+      <label for="api-key">API Key</label>
+      <input type="password" id="api-key" placeholder="Paste your 64-character API key here&hellip;" autocomplete="off" spellcheck="false">
+      <p class="hint">
+        Free tier: 4 requests/minute, 500/day.
+        <a href="https://www.virustotal.com/gui/join-us" target="_blank">Get a free API key &rarr;</a>
+      </p>
+    </div>
+
+    <div class="field">
+      <label for="cache-hours">Cache Duration (hours)</label>
+      <input type="number" id="cache-hours" min="1" max="168" value="24" style="width:100px">
+      <p class="hint">Reuse a previous scan result if it's within this many hours old. Saves API quota.</p>
+    </div>
+
+    <button class="btn-primary" id="btn-save">Save Settings</button>
+    <div id="status"></div>
+  </div>
+
+  <!-- Risk Thresholds -->
+  <div class="card">
+    <div class="card-title">Risk Thresholds</div>
+
+    <div class="threshold-row">
+      <span><span class="color-dot" style="background:#e65100"></span>Mark as <strong>Suspicious</strong> when malicious detections &ge;</span>
+      <select id="thresh-suspicious">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+      </select>
+    </div>
+
+    <div class="threshold-row">
+      <span><span class="color-dot" style="background:#b71c1c"></span>Mark as <strong>Malicious</strong> when malicious detections &ge;</span>
+      <select id="thresh-malicious">
+        <option value="3">3</option>
+        <option value="5" selected>5</option>
+        <option value="8">8</option>
+        <option value="10">10</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Cache & Usage Stats -->
+  <div class="card">
+    <div class="card-title">Cache &amp; Usage</div>
+
+    <div class="stats-row">
+      <span>URLs cached in memory</span>
+      <span class="val" id="cache-count">—</span>
+    </div>
+
+    <div class="stats-row">
+      <span>Private window access</span>
+      <span class="val" id="incognito-status">—</span>
+    </div>
+
+    <div class="actions-row">
+      <button class="btn-secondary" id="btn-clear-cache">Clear Cache</button>
+    </div>
+  </div>
+
+  <footer>
+    Private Browser: no cookies, no history, no saved storage &mdash; all cleared on close.<br>
+    To enable: go to <strong>about:addons</strong> &rarr; URL Checker &rarr; <strong>Allow in Private Windows</strong>.<br>
+    Does <strong>not</strong> provide OS-level process isolation or block file downloads.
+  </footer>
+
+</div>
+<script src="../shared/crypto-utils.js"></script>
+<script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+{
+  "manifest_version": 2,
+  "name": "URL Checker",
+  "version": "1.0.0",
+  "description": "Check links via VirusTotal and open in an isolated container tab",
+  "permissions": [
+    "contextMenus",
+    "tabs",
+    "storage",
+    "notifications",
+    "*://*/*"
+  ],
+  "background": {
+    "scripts": ["shared/crypto-utils.js", "background.js"],
+    "persistent": true
+  },
+  "browser_action": {
+    "default_icon": {
+      "48": "icons/icon48.png",
+      "96": "icons/icon96.png"
+    },
+    "default_title": "URL Checker"
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
+  "icons": {
+    "48": "icons/icon48.png",
+    "96": "icons/icon96.png"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "sandbox-link-checker@local",
+      "strict_min_version": "77.0"
+    }
+  }
+}

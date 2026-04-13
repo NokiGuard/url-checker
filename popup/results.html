@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Link Safety Check</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 14px;
+      color: #1a1a1a;
+      background: #f5f5f5;
+      min-height: 100vh;
+    }
+
+    /* ---- Loading ---- */
+    #loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      gap: 16px;
+      color: #555;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e0e0e0;
+      border-top-color: #1565c0;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ---- Results ---- */
+    #results { display: none; }
+
+    /* Risk banner */
+    #risk-banner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 20px;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    #risk-banner .icon { font-size: 26px; line-height: 1; }
+
+    #cache-badge {
+      display: none;
+      margin-left: auto;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(255,255,255,0.25);
+      border-radius: 12px;
+      padding: 3px 10px;
+      letter-spacing: 0.5px;
+    }
+
+    .risk-clean      { background: #2e7d32; }
+    .risk-suspicious { background: #e65100; }
+    .risk-malicious  { background: #b71c1c; }
+
+    /* URL row */
+    #url-row {
+      background: #fff;
+      padding: 10px 20px;
+      border-bottom: 1px solid #e8e8e8;
+      font-size: 12px;
+      color: #555;
+      word-break: break-all;
+      line-height: 1.5;
+    }
+
+    #url-row strong { color: #1a1a1a; display: block; margin-bottom: 2px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Stats */
+    #stats {
+      display: flex;
+      background: #fff;
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    .stat {
+      flex: 1;
+      text-align: center;
+      padding: 14px 8px;
+      border-right: 1px solid #f0f0f0;
+    }
+
+    .stat:last-child { border-right: none; }
+
+    .stat-num {
+      font-size: 26px;
+      font-weight: 700;
+      color: #1a1a1a;
+      line-height: 1;
+    }
+
+    .stat-num.danger { color: #b71c1c; }
+    .stat-num.warn   { color: #e65100; }
+
+    .stat-label {
+      font-size: 10px;
+      color: #888;
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Vendor table */
+    #vendor-section {
+      max-height: 210px;
+      overflow-y: auto;
+      background: #fff;
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    #vendor-section table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    #vendor-section thead tr {
+      position: sticky;
+      top: 0;
+      background: #f9f9f9;
+      z-index: 1;
+    }
+
+    #vendor-section th {
+      text-align: left;
+      padding: 7px 12px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #888;
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    #vendor-section td {
+      padding: 6px 12px;
+      border-bottom: 1px solid #f5f5f5;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 180px;
+    }
+
+    .cat-malicious, .cat-phishing { color: #b71c1c; font-weight: 600; }
+    .cat-suspicious               { color: #e65100; font-weight: 600; }
+    .cat-clean, .cat-undetected   { color: #888; }
+
+    /* Disclaimer */
+    #disclaimer {
+      padding: 10px 20px;
+      font-size: 11px;
+      color: #777;
+      background: #fffde7;
+      border-bottom: 1px solid #fff9c4;
+      line-height: 1.5;
+    }
+
+    /* Action buttons */
+    #actions {
+      display: flex;
+      gap: 10px;
+      padding: 14px 20px;
+      background: #fff;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 11px;
+      border: none;
+      border-radius: 7px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: filter 0.15s, transform 0.1s;
+    }
+
+    .btn:hover  { filter: brightness(0.9); }
+    .btn:active { transform: scale(0.98); }
+
+    #btn-cancel { background: #e0e0e0; color: #444; }
+    #btn-open   { background: #1565c0; color: #fff; }
+
+    /* Scrollbar styling */
+    #vendor-section::-webkit-scrollbar { width: 6px; }
+    #vendor-section::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <!-- Loading state -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <span>Checking URL safety&hellip;</span>
+  </div>
+
+  <!-- Results state -->
+  <div id="results">
+    <div id="risk-banner">
+      <span class="icon" id="risk-icon"></span>
+      <span id="risk-label"></span>
+      <span id="cache-badge">Cached</span>
+    </div>
+
+    <div id="url-row">
+      <strong>URL</strong>
+      <span id="url-text"></span>
+    </div>
+
+    <div id="stats">
+      <div class="stat">
+        <div class="stat-num" id="stat-malicious">0</div>
+        <div class="stat-label">Malicious</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="stat-suspicious">0</div>
+        <div class="stat-label">Suspicious</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="stat-harmless">0</div>
+        <div class="stat-label">Clean</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="stat-total">0</div>
+        <div class="stat-label">Engines</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="stat-date" style="font-size:13px">—</div>
+        <div class="stat-label">Scanned</div>
+      </div>
+    </div>
+
+    <div id="vendor-section">
+      <table>
+        <thead>
+          <tr>
+            <th>Engine</th>
+            <th>Category</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody id="vendor-tbody"></tbody>
+      </table>
+    </div>
+
+    <div id="disclaimer">
+      Private Browser: no cookies, no history, no saved storage &mdash; all cleared when closed.
+      It does <strong>not</strong> provide OS-level process isolation or block file downloads.
+    </div>
+
+    <div id="actions">
+      <button class="btn" id="btn-cancel">Cancel</button>
+      <button class="btn" id="btn-open">Open in Private Browser</button>
+    </div>
+  </div>
+
+  <script src="results.js"></script>
+</body>
+</html>
